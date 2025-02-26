@@ -1,16 +1,18 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { appConfig, dbConfig } from './common/config/app.config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { TestModule } from './modules/test/test.module';
 
 @Module({
   imports: [
+    // Setting configuration
     ConfigModule.forRoot({
       isGlobal: true,
       load: [appConfig, dbConfig],
     }),
+
+    // Connecting to MongoDB
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -18,9 +20,13 @@ import { MongooseModule } from '@nestjs/mongoose';
       }),
       inject: [ConfigService],
     }),
+
+    // Schema models
     MongooseModule.forFeature([]),
+
+    // Modules
+    TestModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  providers: [],
 })
 export class AppModule {}
