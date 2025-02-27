@@ -10,14 +10,14 @@ export const appConfig = registerAs(
     host: process.env.APP_HOST || '0.0.0.0',
     port: parseInt(process.env.APP_PORT) || 9000,
     cors_domains: process.env.CORS_DOMAINS || '*',
-  }),
+  })
 );
 
 export const dbConfig = registerAs(
   CONFIG_PRISMA_DB_TOKEN,
   (): DbConfig => ({
     url: process.env.DATABASE_URL || 'mongodb://localhost:27017/crm',
-  }),
+  })
 );
 
 export type AppConfig = {
@@ -34,4 +34,9 @@ export const ValidatorConfig = {
   transform: true,
   stopAtFirstError: true,
   whitelist: true,
+};
+
+export const JwtConfig = {
+  secret: process.env.JWT_SECRET_KEY || 'secret-key',
+  expiresIn: process.env.JWT_EXPIRES_IN || '10d',
 };

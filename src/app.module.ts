@@ -2,7 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { appConfig, dbConfig } from './common/config/app.config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { TestModule } from './modules/test/test.module';
+import { UserModule } from './modules/user/user.module';
+import { UserModelDefinition } from './models/schemas/user.schema';
 
 @Module({
   imports: [
@@ -21,11 +22,8 @@ import { TestModule } from './modules/test/test.module';
       inject: [ConfigService],
     }),
 
-    // Schema models
-    MongooseModule.forFeature([]),
-
     // Modules
-    TestModule,
+    UserModule,
   ],
   providers: [],
 })
