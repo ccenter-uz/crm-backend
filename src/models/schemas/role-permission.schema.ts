@@ -1,22 +1,17 @@
 import { ModelDefinition, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { model, ObjectId, Document } from 'mongoose';
 import { DefaultStatusEnum, UserRoleEnum } from 'src/types/global/constants';
-import { DefaultStatusType, UserRoleType } from 'src/types/global/types';
+import {
+  DefaultStatusType,
+  PermissionsType,
+  UserRoleType,
+} from 'src/types/global/types';
 
-export type UserDocument = User & Document;
+export type RolePermissionDocument = RolePermission & Document;
 
 @Schema({ versionKey: false })
-export class User {
+export class RolePermission {
   _id: ObjectId;
-
-  @Prop({ type: String, required: true })
-  full_name: string;
-
-  @Prop({ type: String, required: true, unique: true })
-  username: string;
-
-  @Prop({ type: String, required: true })
-  password: string;
 
   @Prop({ type: String, enum: UserRoleEnum, required: true })
   role: UserRoleType;
@@ -29,7 +24,8 @@ export class User {
   })
   status: DefaultStatusType;
 
-  // organization_id
+  @Prop({ type: Array, required: true })
+  permissions: PermissionsType[];
 
   @Prop({ type: Number, required: true })
   created_at: number;
@@ -41,11 +37,12 @@ export class User {
   deleted_at: number;
 }
 
-const collectionName = 'USER';
-export const UserSchema = SchemaFactory.createForClass(User);
-export const UserModelDefinition: ModelDefinition = {
-  name: User.name,
-  schema: UserSchema,
+const collectionName = 'ROLE_PERMISSION';
+export const RolePermissionSchema =
+  SchemaFactory.createForClass(RolePermission);
+export const RolePermissionModelDefinition: ModelDefinition = {
+  name: RolePermission.name,
+  schema: RolePermissionSchema,
   collection: collectionName,
 };
-model(User.name, UserSchema, collectionName);
+model(RolePermission.name, RolePermissionSchema, collectionName);

@@ -81,7 +81,7 @@ export class AllExceptionFilter implements ExceptionFilter {
     if (exception instanceof MongooseError.ValidationError) {
       console.log(
         Object.values(exception.errors).map((err) => err.message),
-        'VALIDATION ERROR MONGO',
+        'VALIDATION ERROR MONGO'
       );
       return Object.values(exception.errors).map((err) => err.message)[0];
     }

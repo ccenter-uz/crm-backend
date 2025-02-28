@@ -4,6 +4,9 @@ import { appConfig, dbConfig } from './common/config/app.config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './modules/user/user.module';
 import { UserModelDefinition } from './models/schemas/user.schema';
+import { APP_FILTER } from '@nestjs/core';
+import { AllExceptionFilter } from './common/filter/all-exceptions.filter';
+import { RolePermissionModule } from './modules/role-permission/role-permission.module';
 
 @Module({
   imports: [
@@ -24,7 +27,13 @@ import { UserModelDefinition } from './models/schemas/user.schema';
 
     // Modules
     UserModule,
+    RolePermissionModule,
   ],
-  providers: [],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionFilter,
+    },
+  ],
 })
 export class AppModule {}

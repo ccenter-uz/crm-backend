@@ -57,6 +57,7 @@ export class UserService {
       {
         userId: user.id,
         roleId: user.roleId,
+        // organizationId: user.organization_id,
       },
       { expiresIn: Config.JwtConfig.expiresIn }
     );

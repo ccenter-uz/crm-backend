@@ -12,3 +12,11 @@ export enum DefaultStatusEnum {
 
 export const ErrorMessageForPassword =
   'Password too weak. Must include uppercase, lowercase, number, and special character.';
+
+export enum PermissionMethodsEnum {
+  POST = 'POST',
+  GET = 'GET',
+  PUT = 'PUT',
+  PATCH = 'PATCH',
+  DELETE = 'DELETE',
+}
