@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { appConfig, dbConfig } from './common/config/app.config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -7,6 +7,8 @@ import { UserModelDefinition } from './models/schemas/user.schema';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionFilter } from './common/filter/all-exceptions.filter';
 import { RolePermissionModule } from './modules/role-permission/role-permission.module';
+import { SeederModule } from './models/seeder/seeder.module';
+import { UserSeedService } from './models/seeder/user-seed.service';
 
 @Module({
   imports: [
@@ -28,6 +30,7 @@ import { RolePermissionModule } from './modules/role-permission/role-permission.
     // Modules
     UserModule,
     RolePermissionModule,
+    SeederModule,
   ],
   providers: [
     {
@@ -36,4 +39,10 @@ import { RolePermissionModule } from './modules/role-permission/role-permission.
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements OnModuleInit {
+  constructor(private readonly userSeedService: UserSeedService) {}
+
+  async onModuleInit() {
+    await this.userSeedService.seed();
+  }
+}
