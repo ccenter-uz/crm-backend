@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from 'src/models/schemas/user.schema';
 import { UserInterfaces, UserLogInDto } from 'src/types/user';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { DefaultStatusEnum } from 'src/types/global';
 import * as Config from '../../common/config/app.config';
 import { JwtService } from '@nestjs/jwt';
