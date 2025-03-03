@@ -40,4 +40,10 @@ export namespace UserInterfaces {
     updatedAt?: Date;
     deletedAt?: Date;
   }
+  export interface UsersResponse {
+    totalDocs: number;
+    totalPage: number;
+    currentPage: number;
+    data: UserResponse[];
+  }
 }

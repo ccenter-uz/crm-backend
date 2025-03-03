@@ -48,9 +48,15 @@ export class UserController {
     return this.userService.getUserById(userId);
   }
 
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  async getAllUsers(): Promise<UserInterfaces.UsersResponse> {
+    return this.userService.getAllUsers();
+  }
+
   @Patch(':id')
   @ApiBody({ type: UpdateUserDto })
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.OK)  
   async updateUser(
     @Param('id') userId: string,
     @Body() data: UpdateUserDto

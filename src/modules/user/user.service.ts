@@ -54,7 +54,6 @@ export class UserService {
   }
 
   async logIn(data: UserLogInDto): Promise<UserInterfaces.LogInResponse> {
-
     const methodName: string = this.logIn.name;
 
     this.logger.debug(`Method: ${methodName} - Request: `, data);
@@ -78,7 +77,6 @@ export class UserService {
     this.logger.debug(`Method: ${methodName} - Response: `, response);
 
     return response;
-
   }
 
   async createUser(
@@ -145,6 +143,38 @@ export class UserService {
     };
 
     this.logger.debug(`Method: ${methodName} - Response: `, response);
+
+    return response;
+  }
+
+  async getAllUsers(): Promise<UserInterfaces.UsersResponse> {
+    const methodName: string = this.getAllUsers.name;
+    this.logger.debug(`Method: ${methodName} - Fetching all users`);
+
+    const users = await this.userModel.find({
+      status: DefaultStatusEnum.Active,
+    });
+
+    const userResponses: UserInterfaces.UserResponse[] = users.map((user) => ({
+      id: user._id.toString(),
+      username: user.username,
+      fullName: user.full_name,
+      role: user.role,
+      deletedAt: user.deleted_at ? unixTimestampToDate(user.deleted_at) : null,
+      updatedAt: user.updated_at ? unixTimestampToDate(user.updated_at) : null,
+      createdAt: user.created_at ? unixTimestampToDate(user.created_at) : null,
+    }));
+
+    const response: UserInterfaces.UsersResponse = {
+      totalDocs: userResponses.length,
+      totalPage: 1, // Assuming no pagination is implemented yet
+      currentPage: 1, // Assuming no pagination is implemented yet
+      data: userResponses,
+    };
+
+    this.logger.debug(
+      `Method: ${methodName} - Response - Total: ${response.totalDocs}`
+    );
 
     return response;
   }

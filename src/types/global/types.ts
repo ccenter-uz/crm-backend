@@ -26,3 +26,13 @@ export type PermissionMethodsType =
   | PermissionMethodsEnum.PUT
   | PermissionMethodsEnum.PATCH
   | PermissionMethodsEnum.DELETE;
+
+export interface ApiResponseType<T> {
+  status: number;
+  result: T | null;
+  error: ApiErrorType | null;
+}
+export interface ApiErrorType {
+  message: string;
+  details?: any;
+}
