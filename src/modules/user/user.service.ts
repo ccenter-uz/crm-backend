@@ -65,7 +65,6 @@ export class UserService {
       {
         userId: user.id,
         roleId: user.roleId,
-        // organizationId: user.organization_id,
       },
       { expiresIn: Config.JwtConfig.expiresIn }
     );
@@ -123,7 +122,11 @@ export class UserService {
     const methodName: string = this.getUserById.name;
     this.logger.debug(`Method: ${methodName} - Request: `, userId);
 
-    const user = await this.userModel.findById(userId);
+    const user = await this.userModel.findOne({
+      _id: userId,
+      status: DefaultStatusEnum.Active,
+    });
+
     if (!user) {
       this.logger.debug(`Method: ${methodName} - User Not Found`);
       throw new NotFoundException('User not found');
@@ -151,7 +154,11 @@ export class UserService {
     const methodName: string = this.updateUser.name;
     this.logger.debug(`Method: ${methodName} - Request: `, { userId, data });
 
-    const user = await this.userModel.findById(userId);
+    const user = await this.userModel.findOne({
+      _id: userId,
+      status: DefaultStatusEnum.Active,
+    });
+
     if (!user) {
       this.logger.debug(`Method: ${methodName} - User Not Found`);
       throw new NotFoundException('User not found');
@@ -161,9 +168,14 @@ export class UserService {
       data.password = await hashPassword(data.password);
     }
 
-    Object.assign(user, data, {
-      updated_at: Math.floor(new Date().getTime() / 1000).toString(),
-    });
+    Object.assign(
+      user,
+      { ...data, full_name: data.fullName },
+      {
+        updated_at: Math.floor(new Date().getTime() / 1000).toString(),
+      }
+    );
+
     await user.save();
 
     const response: UserInterfaces.UserResponse = {
@@ -185,7 +197,11 @@ export class UserService {
     const methodName: string = this.deleteUser.name;
     this.logger.debug(`Method: ${methodName} - Request: `, userId);
 
-    const user = await this.userModel.findById(userId);
+    const user = await this.userModel.findOne({
+      _id: userId,
+      status: DefaultStatusEnum.Active,
+    });
+
     if (!user) {
       this.logger.debug(`Method: ${methodName} - User Not Found`);
       throw new NotFoundException('User not found');
@@ -196,5 +212,40 @@ export class UserService {
     await user.save();
 
     this.logger.debug(`Method: ${methodName} - User Deleted: `, userId);
+  }
+
+  async restoreUser(userId: string): Promise<UserInterfaces.UserResponse> {
+    const methodName: string = this.restoreUser.name;
+    this.logger.debug(`Method: ${methodName} - Request: `, userId);
+
+    const user = await this.userModel.findOne({
+      _id: userId,
+      status: DefaultStatusEnum.InActive,
+    });
+
+    if (!user) {
+      this.logger.debug(`Method: ${methodName} - User Not Found`);
+      throw new NotFoundException('User not found');
+    }
+
+    user.status = DefaultStatusEnum.Active;
+    user.deleted_at = null;
+    user.updated_at = Math.floor(new Date().getTime() / 1000).toString();
+    
+    await user.save();
+
+    const response: UserInterfaces.UserResponse = {
+      id: user._id.toString(),
+      username: user.username,
+      full_name: user.full_name,
+      role: user.role,
+      deleted_at: null,
+      updated_at: user.updated_at ? unixTimestampToDate(user.updated_at) : null,
+      created_at: user.created_at ? unixTimestampToDate(user.created_at) : null,
+    };
+
+    this.logger.debug(`Method: ${methodName} - User Restored: `, response);
+
+    return response;
   }
 }

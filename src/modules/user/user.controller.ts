@@ -14,7 +14,7 @@ import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { UserInterfaces } from 'src/types/user';
 import { CreateUserDto } from 'src/types/user';
 import { UserLogInDto } from 'src/types/user';
-import { UpdateUserDto } from 'src/types/user/dto/update-user.dto';
+import { UpdateUserDto } from 'src/types/user';
 
 @ApiBearerAuth()
 @ApiTags('user')
@@ -62,5 +62,13 @@ export class UserController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(@Param('id') userId: string): Promise<void> {
     return this.userService.deleteUser(userId);
+  }
+
+  @Patch('restore/:id')
+  @HttpCode(HttpStatus.OK)
+  async restoreUser(
+    @Param('id') userId: string
+  ): Promise<UserInterfaces.UserResponse> {
+    return this.userService.restoreUser(userId);
   }
 }
