@@ -35,7 +35,7 @@ export class UserController {
   @ApiBody({ type: CreateUserDto })
   @HttpCode(HttpStatus.CREATED)
   async createUser(
-    @Body() data: UserInterfaces.CreateUserDto
+    @Body() data: CreateUserDto
   ): Promise<UserInterfaces.UserResponse> {
     return this.userService.createUser(data);
   }
@@ -53,7 +53,7 @@ export class UserController {
   @HttpCode(HttpStatus.OK)
   async updateUser(
     @Param('id') userId: string,
-    @Body() data: UserInterfaces.UpdateUserDto
+    @Body() data: UpdateUserDto
   ): Promise<UserInterfaces.UserResponse> {
     return this.userService.updateUser(userId, data);
   }

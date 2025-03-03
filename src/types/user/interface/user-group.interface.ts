@@ -18,9 +18,9 @@ export namespace UserInterfaces {
     password: string;
     role: UserRoleEnum;
     status: DefaultStatusEnum;
-    created_at?: string;
-    updated_at?: string;
-    deleted_at?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    deletedAt?: string;
   }
 
   export interface UpdateUserDto {
@@ -34,10 +34,10 @@ export namespace UserInterfaces {
   export interface UserResponse {
     id: string;
     username: string;
-    full_name: string;
+    fullName: string;
     role: string;
-    created_at?: Date;
-    updated_at?: Date;
-    deleted_at?: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
+    deletedAt?: Date;
   }
 }

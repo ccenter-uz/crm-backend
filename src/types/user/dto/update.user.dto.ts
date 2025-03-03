@@ -37,7 +37,6 @@ export class UpdateUserDto implements UserInterfaces.UpdateUserDto {
 
   @ApiProperty({ enum: DefaultStatusEnum })
   @IsOptional()
-  @IsString()
   @IsEnum(DefaultStatusEnum)
   status?: DefaultStatusEnum;
 }

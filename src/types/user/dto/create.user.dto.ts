@@ -37,7 +37,6 @@ export class CreateUserDto implements UserInterfaces.CreateUserDto {
 
   @ApiProperty({ enum: DefaultStatusEnum })
   @IsNotEmpty()
-  @IsString()
   @IsEnum(DefaultStatusEnum)
   status: DefaultStatusEnum;
 }

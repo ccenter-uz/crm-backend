@@ -54,6 +54,7 @@ export class UserService {
   }
 
   async logIn(data: UserLogInDto): Promise<UserInterfaces.LogInResponse> {
+
     const methodName: string = this.logIn.name;
 
     this.logger.debug(`Method: ${methodName} - Request: `, data);
@@ -72,11 +73,12 @@ export class UserService {
     const response: UserInterfaces.LogInResponse = {
       accessToken,
       permissions: [],
-      user: { id: user._id, name: user.name, role: user.role },
+      user: { id: user._id, fullName: user.full_name, role: user.role },
     };
     this.logger.debug(`Method: ${methodName} - Response: `, response);
 
     return response;
+
   }
 
   async createUser(
@@ -100,15 +102,15 @@ export class UserService {
     const response: UserInterfaces.UserResponse = {
       id: createdUser._id.toString(),
       username: createdUser.username,
-      full_name: createdUser.full_name,
+      fullName: createdUser.full_name,
       role: createdUser.role,
-      deleted_at: createdUser.deleted_at
+      deletedAt: createdUser.deleted_at
         ? unixTimestampToDate(createdUser.deleted_at)
         : null,
-      updated_at: createdUser.updated_at
+      updatedAt: createdUser.updated_at
         ? unixTimestampToDate(createdUser.updated_at)
         : null,
-      created_at: createdUser.created_at
+      createdAt: createdUser.created_at
         ? unixTimestampToDate(createdUser.created_at)
         : null,
     };
@@ -135,11 +137,11 @@ export class UserService {
     const response: UserInterfaces.UserResponse = {
       id: user._id.toString(),
       username: user.username,
-      full_name: user.full_name,
+      fullName: user.full_name,
       role: user.role,
-      deleted_at: user.deleted_at ? unixTimestampToDate(user.deleted_at) : null,
-      updated_at: user.updated_at ? unixTimestampToDate(user.updated_at) : null,
-      created_at: user.created_at ? unixTimestampToDate(user.created_at) : null,
+      deletedAt: user.deleted_at ? unixTimestampToDate(user.deleted_at) : null,
+      updatedAt: user.updated_at ? unixTimestampToDate(user.updated_at) : null,
+      createdAt: user.created_at ? unixTimestampToDate(user.created_at) : null,
     };
 
     this.logger.debug(`Method: ${methodName} - Response: `, response);
@@ -181,11 +183,11 @@ export class UserService {
     const response: UserInterfaces.UserResponse = {
       id: user._id.toString(),
       username: user.username,
-      full_name: user.full_name,
+      fullName: user.full_name,
       role: user.role,
-      deleted_at: user.deleted_at ? unixTimestampToDate(user.deleted_at) : null,
-      updated_at: user.updated_at ? unixTimestampToDate(user.updated_at) : null,
-      created_at: user.created_at ? unixTimestampToDate(user.created_at) : null,
+      deletedAt: user.deleted_at ? unixTimestampToDate(user.deleted_at) : null,
+      updatedAt: user.updated_at ? unixTimestampToDate(user.updated_at) : null,
+      createdAt: user.created_at ? unixTimestampToDate(user.created_at) : null,
     };
 
     this.logger.debug(`Method: ${methodName} - Response: `, response);
@@ -231,17 +233,17 @@ export class UserService {
     user.status = DefaultStatusEnum.Active;
     user.deleted_at = null;
     user.updated_at = Math.floor(new Date().getTime() / 1000).toString();
-    
+
     await user.save();
 
     const response: UserInterfaces.UserResponse = {
       id: user._id.toString(),
       username: user.username,
-      full_name: user.full_name,
+      fullName: user.full_name,
       role: user.role,
-      deleted_at: null,
-      updated_at: user.updated_at ? unixTimestampToDate(user.updated_at) : null,
-      created_at: user.created_at ? unixTimestampToDate(user.created_at) : null,
+      deletedAt: null,
+      updatedAt: user.updated_at ? unixTimestampToDate(user.updated_at) : null,
+      createdAt: user.created_at ? unixTimestampToDate(user.created_at) : null,
     };
 
     this.logger.debug(`Method: ${methodName} - User Restored: `, response);
