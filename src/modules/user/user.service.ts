@@ -15,7 +15,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserLogInDto } from 'src/types/user';
 import { unixTimestampToDate } from 'src/common/helpers/date.helper';
 import { hashPassword } from 'src/common/helpers/hash.helper';
-import getCurrentTimeHelper from 'src/common/helpers/getCurrentTime.helper';
+import getCurrentTimeHelper from 'src/common/helpers/get-current-time.helper';
 
 @Injectable()
 export class UserService {
