@@ -31,7 +31,7 @@ export class UserController {
     return this.userService.logIn(data);
   }
 
-  @Post('create')
+  @Post()
   @ApiBody({ type: CreateUserDto })
   @HttpCode(HttpStatus.CREATED)
   async createUser(
@@ -54,6 +54,7 @@ export class UserController {
     return this.userService.getAllUsers();
   }
 
+  
   @Patch(':id')
   @ApiBody({ type: UpdateUserDto })
   @HttpCode(HttpStatus.OK)  

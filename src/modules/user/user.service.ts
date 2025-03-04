@@ -146,14 +146,13 @@ export class UserService {
 
     return response;
   }
-
   async getAllUsers(): Promise<UserInterfaces.UsersResponse> {
     const methodName: string = this.getAllUsers.name;
     this.logger.debug(`Method: ${methodName} - Fetching all users`);
 
     const users = await this.userModel.find({
       status: DefaultStatusEnum.Active,
-    });
+    }).sort({ created_at: 1 }); // Sort by created_at in ascending order (oldest first)
 
     const userResponses: UserInterfaces.UserResponse[] = users.map((user) => ({
       id: user._id.toString(),
