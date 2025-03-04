@@ -1,3 +1,4 @@
+import { UserDocument } from 'src/models/schemas/user.schema';
 import { DefaultStatusEnum, UserRoleEnum } from 'src/types/global';
 
 export namespace UserInterfaces {
@@ -13,37 +14,36 @@ export namespace UserInterfaces {
   }
 
   export interface CreateUserDto {
-    fullName: string;
+    full_name: string;
     username: string;
     password: string;
     role: UserRoleEnum;
     status: DefaultStatusEnum;
-    createdAt?: string;
-    updatedAt?: string;
-    deletedAt?: string;
+    created_at?: string;
+    updated_at?: string;
+    deleted_at?: string;
   }
 
   export interface UpdateUserDto {
-    fullName?: string;
+    full_name?: string;
     username?: string;
     password?: string;
     role?: UserRoleEnum;
     status?: DefaultStatusEnum;
   }
 
-  export interface UserResponse {
-    id: string;
-    username: string;
-    fullName: string;
-    role: string;
-    createdAt?: Date;
-    updatedAt?: Date;
-    deletedAt?: Date;
+  export interface UserQuery {
+    full_name?: string;
+    username?: string;
+    role?: UserRoleEnum;
+    page?: number;
+    limit?: number;
   }
+
   export interface UsersResponse {
-    totalDocs: number;
-    totalPage: number;
-    currentPage: number;
-    data: UserResponse[];
+    total_docs: number;
+    total_page: number;
+    current_page: number;
+    data: UserDocument[];
   }
 }

@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
@@ -15,6 +16,8 @@ import { UserInterfaces } from 'src/types/user';
 import { CreateUserDto } from 'src/types/user';
 import { UserLogInDto } from 'src/types/user';
 import { UpdateUserDto } from 'src/types/user';
+import { UserDocument } from 'src/models/schemas/user.schema';
+import { QueryUserDto } from 'src/types/user/dto/query-user.dto';
 
 @ApiBearerAuth()
 @ApiTags('user')
@@ -34,24 +37,22 @@ export class UserController {
   @Post()
   @ApiBody({ type: CreateUserDto })
   @HttpCode(HttpStatus.CREATED)
-  async create(
-    @Body() data: CreateUserDto
-  ): Promise<UserInterfaces.UserResponse> {
+  async create(@Body() data: CreateUserDto): Promise<UserDocument> {
     return this.userService.create(data);
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  async getById(
-    @Param('id') userId: string
-  ): Promise<UserInterfaces.UserResponse> {
+  async getById(@Param('id') userId: string): Promise<UserDocument> {
     return this.userService.getById(userId);
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async getAll(): Promise<UserInterfaces.UsersResponse> {
-    return this.userService.getAll();
+  async getAll(
+    @Query() query: QueryUserDto
+  ): Promise<UserInterfaces.UsersResponse> {
+    return this.userService.getAll(query);
   }
 
   @Patch(':id')
@@ -60,7 +61,7 @@ export class UserController {
   async update(
     @Param('id') userId: string,
     @Body() data: UpdateUserDto
-  ): Promise<UserInterfaces.UserResponse> {
+  ): Promise<UserDocument> {
     return this.userService.update(userId, data);
   }
 
@@ -72,9 +73,7 @@ export class UserController {
 
   @Patch('restore/:id')
   @HttpCode(HttpStatus.OK)
-  async restore(
-    @Param('id') userId: string
-  ): Promise<UserInterfaces.UserResponse> {
+  async restore(@Param('id') userId: string): Promise<UserDocument> {
     return this.userService.restore(userId);
   }
 }

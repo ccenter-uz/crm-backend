@@ -1,19 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsEnum, IsNotEmpty, IsString, Length, Matches } from 'class-validator';
 import {
-  IsEnum,
-  IsNotEmpty,
-  IsString,
-  Length,
-  Matches,
-} from 'class-validator';
-import { DefaultStatusEnum, ErrorMessageForPassword, UserRoleEnum } from 'src/types/global/constants';
+  DefaultStatusEnum,
+  ErrorMessageForPassword,
+  UserRoleEnum,
+} from 'src/types/global/constants';
 import { UserInterfaces } from '../interface/user-group.interface';
 
 export class CreateUserDto implements UserInterfaces.CreateUserDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  fullName: string;
+  full_name: string;
 
   @ApiProperty()
   @IsNotEmpty()

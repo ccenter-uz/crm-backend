@@ -1,19 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsEnum, IsOptional, IsString, Length, Matches } from 'class-validator';
 import {
-  IsEnum,
-  IsOptional,
-  IsString,
-  Length,
-  Matches,
-} from 'class-validator';
-import { DefaultStatusEnum, ErrorMessageForPassword, UserRoleEnum } from 'src/types/global/constants';
+  DefaultStatusEnum,
+  ErrorMessageForPassword,
+  UserRoleEnum,
+} from 'src/types/global/constants';
 import { UserInterfaces } from '../interface/user-group.interface';
 
 export class UpdateUserDto implements UserInterfaces.UpdateUserDto {
   @ApiProperty()
   @IsOptional()
   @IsString()
-  fullName?: string;
+  full_name?: string;
 
   @ApiProperty()
   @IsOptional()
@@ -34,9 +32,4 @@ export class UpdateUserDto implements UserInterfaces.UpdateUserDto {
   @IsString()
   @IsEnum(UserRoleEnum)
   role?: UserRoleEnum;
-
-  @ApiProperty({ enum: DefaultStatusEnum })
-  @IsOptional()
-  @IsEnum(DefaultStatusEnum)
-  status?: DefaultStatusEnum;
 }
