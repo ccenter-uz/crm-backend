@@ -24,7 +24,16 @@ export class RolePermission {
   })
   status: DefaultStatusType;
 
-  @Prop({ type: Array, required: true })
+  @Prop({ 
+    type: Array, 
+    required: true,
+    validate: {
+      validator: function(v) {
+        return Array.isArray(v) && v.length > 0;
+      },
+      message: 'Permissions cannot be empty'
+    }
+  })
   permissions: PermissionsType[];
 
   @Prop({ type: Number, required: true })

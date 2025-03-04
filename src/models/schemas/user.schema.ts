@@ -9,13 +9,19 @@ export type UserDocument = User & Document;
 export class User {
   _id: ObjectId;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: true, maxlength: 200, minlength: 2 })
   full_name: string;
 
-  @Prop({ type: String, required: true, unique: true })
+  @Prop({
+    type: String,
+    required: true,
+    unique: true,
+    maxlength: 50,
+    minlength: 3,
+  })
   username: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: true, maxlength: 100, minlength: 8 })
   password: string;
 
   @Prop({ type: String, enum: UserRoleEnum, required: true })
