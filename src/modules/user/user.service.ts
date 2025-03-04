@@ -15,6 +15,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserLogInDto } from 'src/types/user';
 import { unixTimestampToDate } from 'src/common/helpers/date.helper';
 import { hashPassword } from 'src/common/helpers/hash.helper';
+import getCurrentTimeHelper from 'src/common/helpers/getCurrentTime.helper';
 
 @Injectable()
 export class UserService {
@@ -25,8 +26,8 @@ export class UserService {
     private readonly jwtService: JwtService
   ) {}
 
-  async validateUser(username: string, password: string): Promise<any> {
-    const methodName: string = this.validateUser.name;
+  async validate(username: string, password: string): Promise<any> {
+    const methodName: string = this.validate.name;
     this.logger.debug(`Method: ${methodName} - Validate Method: `, {
       username,
       password,
@@ -58,7 +59,7 @@ export class UserService {
 
     this.logger.debug(`Method: ${methodName} - Request: `, data);
 
-    const user = await this.validateUser(data.username, data.password);
+    const user = await this.validate(data.username, data.password);
     this.logger.debug(`Method: ${methodName} - Validate Response: `, user);
 
     const accessToken = this.jwtService.sign(
@@ -72,54 +73,33 @@ export class UserService {
     const response: UserInterfaces.LogInResponse = {
       accessToken,
       permissions: [],
-      user: { id: user._id, fullName: user.full_name, role: user.role },
+      user: { id: user._id, full_name: user.full_name, role: user.role },
     };
     this.logger.debug(`Method: ${methodName} - Response: `, response);
 
     return response;
   }
 
-  async createUser(
-    data: UserInterfaces.CreateUserDto
-  ): Promise<UserInterfaces.UserResponse> {
-    const methodName: string = this.createUser.name;
+  async create(data: UserInterfaces.CreateUserDto): Promise<UserDocument> {
+    const methodName: string = this.create.name;
     this.logger.debug(`Method: ${methodName} - Request: `, data);
 
     const hashedPassword = await hashPassword(data.password);
     const createdUser = new this.userModel({
       ...data,
-      full_name: data.fullName,
       password: hashedPassword,
       status: DefaultStatusEnum.Active,
-      created_at: Math.floor(new Date().getTime() / 1000).toString(),
+      created_at: getCurrentTimeHelper(),
     });
 
     await createdUser.save();
     this.logger.debug(`Method: ${methodName} - User Created: `, createdUser);
 
-    const response: UserInterfaces.UserResponse = {
-      id: createdUser._id.toString(),
-      username: createdUser.username,
-      fullName: createdUser.full_name,
-      role: createdUser.role,
-      deletedAt: createdUser.deleted_at
-        ? unixTimestampToDate(createdUser.deleted_at)
-        : null,
-      updatedAt: createdUser.updated_at
-        ? unixTimestampToDate(createdUser.updated_at)
-        : null,
-      createdAt: createdUser.created_at
-        ? unixTimestampToDate(createdUser.created_at)
-        : null,
-    };
-
-    this.logger.debug(`Method: ${methodName} - Response: `, response);
-
-    return response;
+    return createdUser;
   }
 
-  async getUserById(userId: string): Promise<UserInterfaces.UserResponse> {
-    const methodName: string = this.getUserById.name;
+  async getById(userId: string): Promise<UserDocument> {
+    const methodName: string = this.getById.name;
     this.logger.debug(`Method: ${methodName} - Request: `, userId);
 
     const user = await this.userModel.findOne({
@@ -132,151 +112,117 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
-    const response: UserInterfaces.UserResponse = {
-      id: user._id.toString(),
-      username: user.username,
-      fullName: user.full_name,
-      role: user.role,
-      deletedAt: user.deleted_at ? unixTimestampToDate(user.deleted_at) : null,
-      updatedAt: user.updated_at ? unixTimestampToDate(user.updated_at) : null,
-      createdAt: user.created_at ? unixTimestampToDate(user.created_at) : null,
-    };
+    this.logger.debug(`Method: ${methodName} - Response: `, user);
 
-    this.logger.debug(`Method: ${methodName} - Response: `, response);
-
-    return response;
+    return user;
   }
-  async getAllUsers(): Promise<UserInterfaces.UsersResponse> {
-    const methodName: string = this.getAllUsers.name;
-    this.logger.debug(`Method: ${methodName} - Fetching all users`);
 
-    const users = await this.userModel.find({
-      status: DefaultStatusEnum.Active,
-    }).sort({ created_at: 1 }); // Sort by created_at in ascending order (oldest first)
+  async getAll(
+    query: UserInterfaces.UserQuery
+  ): Promise<UserInterfaces.UsersResponse> {
+    const methodName: string = this.getAll.name;
+    this.logger.debug(
+      `Method: ${methodName} - Fetching users with filters:`,
+      query
+    );
 
-    const userResponses: UserInterfaces.UserResponse[] = users.map((user) => ({
-      id: user._id.toString(),
-      username: user.username,
-      fullName: user.full_name,
-      role: user.role,
-      deletedAt: user.deleted_at ? unixTimestampToDate(user.deleted_at) : null,
-      updatedAt: user.updated_at ? unixTimestampToDate(user.updated_at) : null,
-      createdAt: user.created_at ? unixTimestampToDate(user.created_at) : null,
-    }));
+    const { full_name, username, role, page = 1, limit = 10 } = query;
+
+    // Build the filter object
+    const filter: any = { status: DefaultStatusEnum.Active };
+
+    // Add optional filters if they exist
+    if (full_name) {
+      filter.full_name = { $regex: full_name, $options: 'i' }; // case-insensitive search
+    }
+
+    if (username) {
+      filter.username = { $regex: username, $options: 'i' };
+    }
+
+    if (role) {
+      filter.role = role;
+    }
+
+    // Calculate pagination parameters
+    const skip = (page - 1) * limit;
+
+    // Count total documents matching the filter
+    const totalDocs = await this.userModel.countDocuments(filter);
+    const totalPages = Math.ceil(totalDocs / limit);
+
+    // Get paginated results
+    const users = await this.userModel
+      .find(filter)
+      .sort({ created_at: 1 })
+      .skip(skip)
+      .limit(limit);
 
     const response: UserInterfaces.UsersResponse = {
-      totalDocs: userResponses.length,
-      totalPage: 1, // Assuming no pagination is implemented yet
-      currentPage: 1, // Assuming no pagination is implemented yet
-      data: userResponses,
+      total_docs: totalDocs,
+      total_page: totalPages,
+      current_page: page,
+      data: users,
     };
 
     this.logger.debug(
-      `Method: ${methodName} - Response - Total: ${response.totalDocs}`
+      `Method: ${methodName} - Response - Total: ${response.total_docs}, Page: ${page}/${totalPages}`
     );
 
     return response;
   }
 
-  async updateUser(
+  async update(
     userId: string,
     data: UserInterfaces.UpdateUserDto
-  ): Promise<UserInterfaces.UserResponse> {
-    const methodName: string = this.updateUser.name;
+  ): Promise<UserDocument> {
+    const methodName: string = this.update.name;
     this.logger.debug(`Method: ${methodName} - Request: `, { userId, data });
 
-    const user = await this.userModel.findOne({
-      _id: userId,
-      status: DefaultStatusEnum.Active,
-    });
-
-    if (!user) {
-      this.logger.debug(`Method: ${methodName} - User Not Found`);
-      throw new NotFoundException('User not found');
-    }
+    const user = await this.getById(userId);
 
     if (data.password) {
       data.password = await hashPassword(data.password);
     }
 
-    Object.assign(
-      user,
-      { ...data, full_name: data.fullName },
-      {
-        updated_at: Math.floor(new Date().getTime() / 1000).toString(),
-      }
-    );
+    Object.assign(user, data, {
+      updated_at: getCurrentTimeHelper(),
+    });
 
     await user.save();
 
-    const response: UserInterfaces.UserResponse = {
-      id: user._id.toString(),
-      username: user.username,
-      fullName: user.full_name,
-      role: user.role,
-      deletedAt: user.deleted_at ? unixTimestampToDate(user.deleted_at) : null,
-      updatedAt: user.updated_at ? unixTimestampToDate(user.updated_at) : null,
-      createdAt: user.created_at ? unixTimestampToDate(user.created_at) : null,
-    };
+    this.logger.debug(`Method: ${methodName} - Response: `, user);
 
-    this.logger.debug(`Method: ${methodName} - Response: `, response);
-
-    return response;
+    return user;
   }
 
-  async deleteUser(userId: string): Promise<void> {
-    const methodName: string = this.deleteUser.name;
+  async delete(userId: string): Promise<void> {
+    const methodName: string = this.delete.name;
     this.logger.debug(`Method: ${methodName} - Request: `, userId);
 
-    const user = await this.userModel.findOne({
-      _id: userId,
-      status: DefaultStatusEnum.Active,
-    });
-
-    if (!user) {
-      this.logger.debug(`Method: ${methodName} - User Not Found`);
-      throw new NotFoundException('User not found');
-    }
+    const user = await this.getById(userId);
 
     user.status = DefaultStatusEnum.InActive;
-    user.deleted_at = Math.floor(new Date().getTime() / 1000).toString();
+    user.deleted_at = getCurrentTimeHelper();
     await user.save();
 
     this.logger.debug(`Method: ${methodName} - User Deleted: `, userId);
   }
 
-  async restoreUser(userId: string): Promise<UserInterfaces.UserResponse> {
-    const methodName: string = this.restoreUser.name;
+  async restore(userId: string): Promise<UserDocument> {
+    const methodName: string = this.restore.name;
     this.logger.debug(`Method: ${methodName} - Request: `, userId);
 
-    const user = await this.userModel.findOne({
-      _id: userId,
-      status: DefaultStatusEnum.InActive,
-    });
-
-    if (!user) {
-      this.logger.debug(`Method: ${methodName} - User Not Found`);
-      throw new NotFoundException('User not found');
-    }
+    const user = await this.getById(userId);
 
     user.status = DefaultStatusEnum.Active;
     user.deleted_at = null;
-    user.updated_at = Math.floor(new Date().getTime() / 1000).toString();
+    user.updated_at = getCurrentTimeHelper();
 
     await user.save();
 
-    const response: UserInterfaces.UserResponse = {
-      id: user._id.toString(),
-      username: user.username,
-      fullName: user.full_name,
-      role: user.role,
-      deletedAt: null,
-      updatedAt: user.updated_at ? unixTimestampToDate(user.updated_at) : null,
-      createdAt: user.created_at ? unixTimestampToDate(user.created_at) : null,
-    };
+    this.logger.debug(`Method: ${methodName} - User Restored: `, user);
 
-    this.logger.debug(`Method: ${methodName} - User Restored: `, response);
-
-    return response;
+    return user;
   }
 }

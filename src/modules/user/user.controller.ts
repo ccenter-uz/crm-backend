@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
@@ -15,6 +16,8 @@ import { UserInterfaces } from 'src/types/user';
 import { CreateUserDto } from 'src/types/user';
 import { UserLogInDto } from 'src/types/user';
 import { UpdateUserDto } from 'src/types/user';
+import { UserDocument } from 'src/models/schemas/user.schema';
+import { QueryUserDto } from 'src/types/user/dto/query-user.dto';
 
 @ApiBearerAuth()
 @ApiTags('user')
@@ -34,48 +37,43 @@ export class UserController {
   @Post()
   @ApiBody({ type: CreateUserDto })
   @HttpCode(HttpStatus.CREATED)
-  async createUser(
-    @Body() data: CreateUserDto
-  ): Promise<UserInterfaces.UserResponse> {
-    return this.userService.createUser(data);
+  async create(@Body() data: CreateUserDto): Promise<UserDocument> {
+    return this.userService.create(data);
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  async getUserById(
-    @Param('id') userId: string
-  ): Promise<UserInterfaces.UserResponse> {
-    return this.userService.getUserById(userId);
+  async getById(@Param('id') userId: string): Promise<UserDocument> {
+    return this.userService.getById(userId);
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async getAllUsers(): Promise<UserInterfaces.UsersResponse> {
-    return this.userService.getAllUsers();
+  async getAll(
+    @Query() query: QueryUserDto
+  ): Promise<UserInterfaces.UsersResponse> {
+    return this.userService.getAll(query);
   }
 
-  
   @Patch(':id')
   @ApiBody({ type: UpdateUserDto })
-  @HttpCode(HttpStatus.OK)  
-  async updateUser(
+  @HttpCode(HttpStatus.OK)
+  async update(
     @Param('id') userId: string,
     @Body() data: UpdateUserDto
-  ): Promise<UserInterfaces.UserResponse> {
-    return this.userService.updateUser(userId, data);
+  ): Promise<UserDocument> {
+    return this.userService.update(userId, data);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteUser(@Param('id') userId: string): Promise<void> {
-    return this.userService.deleteUser(userId);
+  async delete(@Param('id') userId: string): Promise<void> {
+    return this.userService.delete(userId);
   }
 
   @Patch('restore/:id')
   @HttpCode(HttpStatus.OK)
-  async restoreUser(
-    @Param('id') userId: string
-  ): Promise<UserInterfaces.UserResponse> {
-    return this.userService.restoreUser(userId);
+  async restore(@Param('id') userId: string): Promise<UserDocument> {
+    return this.userService.restore(userId);
   }
 }
