@@ -25,8 +25,8 @@ export class UserService {
     private readonly jwtService: JwtService
   ) {}
 
-  async validateUser(username: string, password: string): Promise<any> {
-    const methodName: string = this.validateUser.name;
+  async validate(username: string, password: string): Promise<any> {
+    const methodName: string = this.validate.name;
     this.logger.debug(`Method: ${methodName} - Validate Method: `, {
       username,
       password,
@@ -58,7 +58,7 @@ export class UserService {
 
     this.logger.debug(`Method: ${methodName} - Request: `, data);
 
-    const user = await this.validateUser(data.username, data.password);
+    const user = await this.validate(data.username, data.password);
     this.logger.debug(`Method: ${methodName} - Validate Response: `, user);
 
     const accessToken = this.jwtService.sign(
@@ -79,10 +79,10 @@ export class UserService {
     return response;
   }
 
-  async createUser(
+  async create(
     data: UserInterfaces.CreateUserDto
   ): Promise<UserInterfaces.UserResponse> {
-    const methodName: string = this.createUser.name;
+    const methodName: string = this.create.name;
     this.logger.debug(`Method: ${methodName} - Request: `, data);
 
     const hashedPassword = await hashPassword(data.password);
@@ -118,8 +118,8 @@ export class UserService {
     return response;
   }
 
-  async getUserById(userId: string): Promise<UserInterfaces.UserResponse> {
-    const methodName: string = this.getUserById.name;
+  async getById(userId: string): Promise<UserInterfaces.UserResponse> {
+    const methodName: string = this.getById.name;
     this.logger.debug(`Method: ${methodName} - Request: `, userId);
 
     const user = await this.userModel.findOne({
@@ -146,13 +146,15 @@ export class UserService {
 
     return response;
   }
-  async getAllUsers(): Promise<UserInterfaces.UsersResponse> {
-    const methodName: string = this.getAllUsers.name;
+  async getAll(): Promise<UserInterfaces.UsersResponse> {
+    const methodName: string = this.getAll.name;
     this.logger.debug(`Method: ${methodName} - Fetching all users`);
 
-    const users = await this.userModel.find({
-      status: DefaultStatusEnum.Active,
-    }).sort({ created_at: 1 }); // Sort by created_at in ascending order (oldest first)
+    const users = await this.userModel
+      .find({
+        status: DefaultStatusEnum.Active,
+      })
+      .sort({ created_at: 1 }); // Sort by created_at in ascending order (oldest first)
 
     const userResponses: UserInterfaces.UserResponse[] = users.map((user) => ({
       id: user._id.toString(),
@@ -178,11 +180,11 @@ export class UserService {
     return response;
   }
 
-  async updateUser(
+  async update(
     userId: string,
     data: UserInterfaces.UpdateUserDto
   ): Promise<UserInterfaces.UserResponse> {
-    const methodName: string = this.updateUser.name;
+    const methodName: string = this.update.name;
     this.logger.debug(`Method: ${methodName} - Request: `, { userId, data });
 
     const user = await this.userModel.findOne({
@@ -224,8 +226,8 @@ export class UserService {
     return response;
   }
 
-  async deleteUser(userId: string): Promise<void> {
-    const methodName: string = this.deleteUser.name;
+  async delete(userId: string): Promise<void> {
+    const methodName: string = this.delete.name;
     this.logger.debug(`Method: ${methodName} - Request: `, userId);
 
     const user = await this.userModel.findOne({
@@ -245,8 +247,8 @@ export class UserService {
     this.logger.debug(`Method: ${methodName} - User Deleted: `, userId);
   }
 
-  async restoreUser(userId: string): Promise<UserInterfaces.UserResponse> {
-    const methodName: string = this.restoreUser.name;
+  async restore(userId: string): Promise<UserInterfaces.UserResponse> {
+    const methodName: string = this.restore.name;
     this.logger.debug(`Method: ${methodName} - Request: `, userId);
 
     const user = await this.userModel.findOne({

@@ -34,48 +34,47 @@ export class UserController {
   @Post()
   @ApiBody({ type: CreateUserDto })
   @HttpCode(HttpStatus.CREATED)
-  async createUser(
+  async create(
     @Body() data: CreateUserDto
   ): Promise<UserInterfaces.UserResponse> {
-    return this.userService.createUser(data);
+    return this.userService.create(data);
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  async getUserById(
+  async getById(
     @Param('id') userId: string
   ): Promise<UserInterfaces.UserResponse> {
-    return this.userService.getUserById(userId);
+    return this.userService.getById(userId);
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async getAllUsers(): Promise<UserInterfaces.UsersResponse> {
-    return this.userService.getAllUsers();
+  async getAll(): Promise<UserInterfaces.UsersResponse> {
+    return this.userService.getAll();
   }
 
-  
   @Patch(':id')
   @ApiBody({ type: UpdateUserDto })
-  @HttpCode(HttpStatus.OK)  
-  async updateUser(
+  @HttpCode(HttpStatus.OK)
+  async update(
     @Param('id') userId: string,
     @Body() data: UpdateUserDto
   ): Promise<UserInterfaces.UserResponse> {
-    return this.userService.updateUser(userId, data);
+    return this.userService.update(userId, data);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteUser(@Param('id') userId: string): Promise<void> {
-    return this.userService.deleteUser(userId);
+  async delete(@Param('id') userId: string): Promise<void> {
+    return this.userService.delete(userId);
   }
 
   @Patch('restore/:id')
   @HttpCode(HttpStatus.OK)
-  async restoreUser(
+  async restore(
     @Param('id') userId: string
   ): Promise<UserInterfaces.UserResponse> {
-    return this.userService.restoreUser(userId);
+    return this.userService.restore(userId);
   }
 }
