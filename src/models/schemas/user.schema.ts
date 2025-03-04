@@ -29,16 +29,14 @@ export class User {
   })
   status: DefaultStatusType;
 
-  // organization_id
+  @Prop({ type: String, required: true })
+  created_at: string;
 
-  @Prop({ type: Number, required: true })
-  created_at: number;
+  @Prop({ type: String, required: false })
+  updated_at: string;
 
-  @Prop({ type: Number, required: false })
-  updated_at: number;
-
-  @Prop({ type: Number, required: false })
-  deleted_at: number;
+  @Prop({ type: String, required: false })
+  deleted_at: string;
 }
 
 const collectionName = 'USER';
