@@ -15,7 +15,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserLogInDto } from 'src/types/user';
 import { unixTimestampToDate } from 'src/common/helpers/date.helper';
 import { hashPassword } from 'src/common/helpers/hash.helper';
-import getCurrentTimeHelper from 'src/common/helpers/getCurrentTime.helper';
+import getCurrentTime from 'src/common/helpers/get-current-time.helper';
 
 @Injectable()
 export class UserService {
@@ -89,7 +89,7 @@ export class UserService {
       ...data,
       password: hashedPassword,
       status: DefaultStatusEnum.Active,
-      created_at: getCurrentTimeHelper(),
+      created_at: getCurrentTime(),
     });
 
     await createdUser.save();
@@ -186,7 +186,7 @@ export class UserService {
     }
 
     Object.assign(user, data, {
-      updated_at: getCurrentTimeHelper(),
+      updated_at: getCurrentTime(),
     });
 
     await user.save();
@@ -203,7 +203,7 @@ export class UserService {
     const user = await this.getById(userId);
 
     user.status = DefaultStatusEnum.InActive;
-    user.deleted_at = getCurrentTimeHelper();
+    user.deleted_at = getCurrentTime();
     await user.save();
 
     this.logger.debug(`Method: ${methodName} - User Deleted: `, userId);
@@ -217,7 +217,7 @@ export class UserService {
 
     user.status = DefaultStatusEnum.Active;
     user.deleted_at = null;
-    user.updated_at = getCurrentTimeHelper();
+    user.updated_at = getCurrentTime();
 
     await user.save();
 
