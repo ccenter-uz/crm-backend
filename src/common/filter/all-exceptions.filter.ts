@@ -79,9 +79,7 @@ export class AllExceptionFilter implements ExceptionFilter {
     // Send Consistent Error Response
     const errorResponse = {
       statusCode: status,
-      message,
-      path: request.url,
-      timestamp: new Date().toISOString(),
+      message
     };
 
     this.logger.debug(`Error response: ${JSON.stringify(errorResponse)}`);
